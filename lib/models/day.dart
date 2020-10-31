@@ -1,6 +1,4 @@
-import 'package:shoulapp/models/entity.dart';
-
-class Day extends Entity {
+class Day {
   String date;
   String hebrewDate;
   int weekNumber;

@@ -6,11 +6,27 @@ import 'package:kosher_dart/hebrewcalendar/hebrew_date_formatter.dart';
 import 'package:kosher_dart/hebrewcalendar/jewish_date.dart';
 
 class UTitle {
-  static List<String> _torah = ['תורה', 'בלק', 'פרשת', 'פרשה', 'בלעם'];
-  static List<String> _halaha = ['הלכה', 'הלכתה', 'כהלכתה', 'הלכות', 'בהלכה'];
+  static List<String> _torah = [
+    'תורה',
+    'התודה',
+    'לימוד',
+    'בלק',
+    'פרשת',
+    'פרשה',
+    'בלעם'
+  ];
+  static List<String> _halaha = [
+    'הלכה',
+    'הלכתה',
+    'כהלכתה',
+    'הלכות',
+    'בהלכה',
+    'הלכה-'
+  ];
   static List<String> _navi = ['נביא', 'יהושוע', 'יהושע'];
   static List<String> _mishna = ['משנה'];
   static List<String> _songs = ['שיר'];
+  static List<String> _story = ['סיפור', 'סיפורי', 'סיפורים', 'אגדות', 'אגדה'];
 
   static IconData getIcon(String lessonTitle) {
     var titleWords = lessonTitle.split(' ');
@@ -24,7 +40,9 @@ class UTitle {
         return FontAwesomeIcons.crown;
       else if (_mishna.contains(word))
         return FontAwesomeIcons.book;
-      else if (_songs.contains(word)) return Icons.music_note;
+      else if (_story.contains(word))
+        return FontAwesomeIcons.bookOpen;
+      else if (_songs.contains(word)) return FontAwesomeIcons.itunesNote;
     }
 
     return FontAwesomeIcons.ellipsisH;

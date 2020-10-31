@@ -35,8 +35,4 @@ class NetworkHelper {
 
     return listLessons;
   }
-
-  static String _modifyURL(String URL) {
-    return URL.replaceAll('&export=download', '');
-  }
 }

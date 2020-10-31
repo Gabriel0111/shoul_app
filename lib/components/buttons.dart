@@ -1,54 +1,40 @@
 import 'package:flutter/cupertino.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-class FavouriteButton extends StatelessWidget {
+class Button extends StatelessWidget {
   final Function onTap;
-  FavouriteButton({this.onTap});
+  final Widget child;
+  Button({@required this.onTap, @required this.child});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(),
-      child: CupertinoButton(
-        onPressed: onTap,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Icon(
-              CupertinoIcons.heart,
-              color: CupertinoColors.systemPink,
-            ),
-            SizedBox(width: 10),
-            Text(
-              'רשום כשיעור אהוב',
-              style: TextStyle(color: CupertinoColors.systemPink),
-            ),
-          ],
-        ),
-      ),
+      margin: EdgeInsets.all(10.0),
+      child: CupertinoButton(onPressed: onTap, child: child),
     );
   }
 }
 
-class FavouriteButtonSelected extends StatelessWidget {
+class SelectedButton extends StatelessWidget {
   final Function onTap;
-  FavouriteButtonSelected({this.onTap});
+  final Widget child;
+  Color color;
+  SelectedButton({@required this.onTap, @required this.child, this.color});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(top: 4),
-      child: CupertinoButton(
-        color: CupertinoColors.systemPink,
-        onPressed: onTap,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Icon(CupertinoIcons.heart_solid),
-            SizedBox(width: 10),
-            Text('שיעור אהוב'),
-          ],
-        ),
-      ),
+      margin: EdgeInsets.all(12.0),
+      child: (color != null)
+          ? CupertinoButton(
+              color: color,
+              onPressed: onTap,
+              child: child,
+            )
+          : CupertinoButton.filled(
+              onPressed: onTap,
+              child: child,
+            ),
     );
   }
 }

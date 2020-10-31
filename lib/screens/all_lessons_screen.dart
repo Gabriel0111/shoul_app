@@ -1,12 +1,10 @@
-import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:shoulapp/components/centered_indicator.dart';
 import 'package:shoulapp/components/presentation_card.dart';
 import 'package:shoulapp/models/day.dart';
-import 'package:shoulapp/models/lesson.dart';
 import 'package:shoulapp/models/preferences_data.dart';
 import 'package:shoulapp/network/network_helper.dart';
 import 'package:shoulapp/utilities/constants.dart';
@@ -26,13 +24,7 @@ class _AllLessonsScreenState extends State<AllLessonsScreen> {
   @override
   void initState() {
     super.initState();
-    _initProviderAndShowMessage();
     _initList();
-  }
-
-  void _initProviderAndShowMessage() {
-    provider = Provider.of<PreferencesData>(context, listen: false);
-//    if (provider.getShownMessage() == null) showStartingMessage();
   }
 
   void _initList() async {
@@ -45,12 +37,33 @@ class _AllLessonsScreenState extends State<AllLessonsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    return (Platform.isIOS) ? getiOSPage() : getAndroidPage();
+  }
+
+  Widget getiOSPage() {
     return CupertinoPageScaffold(
       child: SafeArea(
+        child: CupertinoScrollbar(
+          child: CustomScrollView(
+            slivers: <Widget>[
+              CupertinoSliverNavigationBar(
+                largeTitle: Text('שיעור יומי'),
+              ),
+              getMainWidget(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget getAndroidPage() {
+    return Scaffold(
+      body: SafeArea(
         child: CustomScrollView(
           slivers: <Widget>[
-            CupertinoSliverNavigationBar(
-              largeTitle: Text('שיעור יומי'),
+            SliverAppBar(
+              title: Text('שיעור יומי'),
             ),
             getMainWidget(),
           ],
@@ -59,40 +72,10 @@ class _AllLessonsScreenState extends State<AllLessonsScreen> {
     );
   }
 
-//  void showStartingMessage() async {
-//    showCupertinoDialog(
-//      context: context,
-//      builder: (context) => CupertinoAlertDialog(
-//        title: Text('לעילוי נשמת'),
-//        content: Column(
-//          children: <Widget>[
-//            Text('הלימוד היומי מוקדש לעילוי נשמת'),
-//            SizedBox(
-//              height: 10,
-//            ),
-//            Text(
-//              'שלמה בן אליהו',
-//              style: TextStyle(fontWeight: FontWeight.bold),
-//            ),
-//          ],
-//        ),
-//        actions: <Widget>[
-//          CupertinoDialogAction(
-//            isDefaultAction: true,
-//            child: Text('הבנתי'),
-//            onPressed: () {
-//              provider.setShownMessage();
-//              Navigator.of(context).pop();
-//            },
-//          ),
-//        ],
-//      ),
-//    );
-//  }
-
   Widget getMainWidget() {
     if (listAllLessons == null)
       return SliverFillRemaining(
+        hasScrollBody: false,
         child: CenteredIndicator(),
       );
     else {

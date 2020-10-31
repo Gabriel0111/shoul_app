@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 class Home extends StatefulWidget {
   @override
@@ -8,26 +9,26 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
   int t = 0;
 
-  var tab = <Widget>[
-    CupertinoButton(
-      child: Text('Un'),
-      onPressed: () {},
-      key: ValueKey<int>(1),
-    ),
-    CupertinoButton(
-      child: Text('Deux'),
-      onPressed: () {},
-      key: ValueKey<int>(2),
-    ),
-    CupertinoButton(
-      child: Text('Trois'),
-      onPressed: () {},
-      key: ValueKey<int>(3),
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    var tab = <Widget>[
+      CupertinoButton(
+        child: Text('Un'),
+        onPressed: () {},
+        key: ValueKey<int>(1),
+      ),
+      CupertinoButton(
+        child: Text('Deux'),
+        onPressed: () {},
+        key: ValueKey<int>(2),
+      ),
+      CupertinoButton(
+        child: Text('Trois'),
+        onPressed: () {},
+        key: ValueKey<int>(3),
+      ),
+    ];
+
     return CupertinoPageScaffold(
       child: SafeArea(
         child: CustomScrollView(

@@ -1,14 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:shoulapp/models/day.dart';
-import 'package:shoulapp/models/entity.dart';
 import 'package:shoulapp/models/lesson.dart';
-import 'package:shoulapp/models/preferences_data.dart';
-import 'package:shoulapp/network/network_helper.dart';
 import '../utilities/constants.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:shoulapp/screens/day_lesson_screen.dart';
 
 class PresentationCard extends StatefulWidget {
   Day entityToDisplay;
@@ -20,13 +17,9 @@ class PresentationCard extends StatefulWidget {
 }
 
 class _PresentationCardState extends State<PresentationCard> {
-  List<IconData> favouriteIcons = [
-    CupertinoIcons.heart,
-    CupertinoIcons.heart_solid
-  ];
-
   Lesson lesson;
   bool isLesson;
+  bool isiOS;
 
   Widget insertIcon() {
     return Expanded(
@@ -45,11 +38,13 @@ class _PresentationCardState extends State<PresentationCard> {
 
   @override
   Widget build(BuildContext context) {
+    isiOS = Platform.isIOS;
+
     try {
       lesson = widget.entityToDisplay as Lesson;
       isLesson = true;
-      var provider = Provider.of<PreferencesData>(context);
-      if (provider.isLessonFavourite(lesson)) lesson.isCompleted = true;
+      //var provider = Provider.of<PreferencesData>(context);
+      //if (provider.isLessonFavourite(lesson)) lesson.isFavouriteLessons = true;
     } catch (t) {
       isLesson = false;
     }
@@ -78,7 +73,7 @@ class _PresentationCardState extends State<PresentationCard> {
               ],
             ),
           ),
-          height: 175,
+          height: 168,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
@@ -89,8 +84,8 @@ class _PresentationCardState extends State<PresentationCard> {
                   children: <Widget>[
                     Expanded(
                       child: Container(
-                        height: 60,
-                        color: Colors.grey[200].withOpacity(0.3),
+                        height: 100,
+                        color: Colors.grey[200].withOpacity(0.2),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.center,
@@ -119,18 +114,28 @@ class _PresentationCardState extends State<PresentationCard> {
                                                 padding: const EdgeInsets.only(
                                                     left: 10),
                                                 child: Icon(
-                                                  CupertinoIcons
-                                                      .check_mark_circled_solid,
-                                                  color: CupertinoColors
-                                                      .activeGreen,
+                                                  (isiOS)
+                                                      ? CupertinoIcons
+                                                          .check_mark_circled_solid
+                                                      : Icons.check_circle,
+                                                  color: (isiOS)
+                                                      ? CupertinoColors
+                                                          .activeGreen
+                                                      : Colors.lightGreenAccent,
                                                 ),
                                               )
                                             : SizedBox(),
                                         Icon(
                                           lesson.isFavouriteLessons
-                                              ? CupertinoIcons.heart_solid
-                                              : CupertinoIcons.heart,
-                                          color: CupertinoColors.systemPink,
+                                              ? (isiOS)
+                                                  ? CupertinoIcons.heart_solid
+                                                  : Icons.favorite
+                                              : (isiOS)
+                                                  ? CupertinoIcons.heart
+                                                  : Icons.favorite_border,
+                                          color: (isiOS)
+                                              ? CupertinoColors.systemPink
+                                              : Colors.pinkAccent,
                                         ),
                                       ],
                                     ),

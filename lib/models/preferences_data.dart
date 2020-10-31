@@ -1,11 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
-import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shoulapp/models/lesson.dart';
 import 'package:shoulapp/network/network_helper.dart';
 import 'package:shoulapp/utilities/u_title.dart';
+import 'package:path_provider/path_provider.dart';
 
 import 'day.dart';
 
@@ -13,20 +14,96 @@ class PreferencesData extends ChangeNotifier {
   SharedPreferences sharedPreferences;
 
   Map<String, dynamic> _playedAtNow = {};
-  List<String> listStartingMessages = [];
   List<Lesson> listSelectedWeekLesson = [];
   List<Lesson> listFavouriteLessons = [];
   List<String> _listCompletedLessons = [];
 
-  dynamic _listDaysLesson;
-  bool shownMessage;
+  Map<String, dynamic> fileContent;
+
+  File jsonFile;
+  Directory dir;
+  String fileName = "favourites.json";
+  bool fileExists = false;
 
   PreferencesData() {
     //_initListDaysLesson();
     _init();
+    //_initFavouriteLessons();
+    _initFavouriteLessonsJson();
     _initListCompletedLessons();
+  }
 
-    shownMessage = hasToDisplayMessage();
+  void _initFavouriteLessonsJson() {
+    getApplicationDocumentsDirectory().then((Directory directory) {
+      dir = directory;
+      File file = new File(dir.path + "/" + fileName);
+      fileExists = file.existsSync();
+      if (fileExists) {
+        print("Le fichier existe !");
+        String content = file.readAsStringSync();
+        print(content);
+        // file.deleteSync();
+        // print("Fichier supprimé");
+        // return;
+        //List<dynamic> list;
+        if (content.isNotEmpty) //fileContent = jsonDecode(content);
+
+        {
+          var b = content.split(" ");
+          var list = json.decode(content);
+          for (var l in list) {
+            print(l);
+            print(l.toString());
+            // var a = Lesson.fromJson(l.toString());
+          }
+        }
+
+        print(content);
+      } else {
+        File file = new File(dir.path + "/" + fileName);
+        file.createSync();
+        fileExists = true;
+      }
+    });
+  }
+
+  //file.writeAsStringSync(jsonEncode(content));
+
+  void writeToFile(String key, String value) {
+    print("Writing to file!");
+    Map<String, String> content = {key: value};
+    if (fileExists) {
+      print("File exists");
+      Map<String, String> jsonFileContent =
+          json.decode(jsonFile.readAsStringSync());
+      jsonFileContent.addAll(content);
+      jsonFile.writeAsStringSync(jsonEncode(jsonFileContent),
+          mode: FileMode.append);
+    } else {
+      print("File does not exist!");
+      //createFile(content, dir, fileName);
+    }
+    fileContent = jsonDecode(jsonFile.readAsStringSync());
+    print(fileContent);
+  }
+
+  void addFavouriteLessons(Lesson lesson) {
+    listFavouriteLessons.add(lesson);
+    File jsonFile = new File(dir.path + "/" + fileName);
+    String content = jsonFile.readAsStringSync();
+    List<dynamic> jsonFileContent = [];
+    if (content.isNotEmpty) jsonFileContent = json.decode(content);
+    jsonFileContent.add(lesson.toJson());
+    jsonFile.writeAsStringSync("[", mode: FileMode.append);
+    jsonFile.writeAsStringSync(jsonEncode(jsonFileContent));
+    // List<String> list = [];
+
+    // for (Lesson l in listFavouriteLessons) list.add(l.toJson().toString());
+    // print(list);
+    // sharedPreferences.setStringList('favouriteLessons', list);
+    //sharedPreferences.setStringList('favouriteLessons', value)
+
+    notifyListeners();
   }
 
   void _init() async {
@@ -63,15 +140,12 @@ class PreferencesData extends ChangeNotifier {
     return false;
   }
 
-  bool isLessonFavourite(Lesson lesson) {
-    for (var l in listFavouriteLessons)
-      if (l.title == lesson.title && l.date == lesson.date) return true;
-    return false;
-  }
-
   void _initListCompletedLessons() async {
-    _listCompletedLessons =
-        await sharedPreferences.getStringList('completedLessons');
+    _listCompletedLessons = (await SharedPreferences.getInstance())
+        .getStringList('completedLessons');
+    _listCompletedLessons = _listCompletedLessons ?? [];
+
+    print('listCompletedLessons ' + _listCompletedLessons.toString());
   }
 
   void _updateCompletedLessons() async {
@@ -88,7 +162,20 @@ class PreferencesData extends ChangeNotifier {
 
   void _updateFavouriteLessons() async {
     await sharedPreferences.setString('playedAtNow', jsonEncode(_playedAtNow));
-    //print(await sharedPreferences.getString('playedAtNow'));
+    notifyListeners();
+  }
+
+  bool isLessonFavourite(Lesson lesson) {
+    for (var l in listFavouriteLessons)
+      if (l.title == lesson.title && l.date == lesson.date) return true;
+    return false;
+  }
+
+  void removeFavouriteLessons(Lesson lesson) {
+    for (var l in listFavouriteLessons.toList())
+      if (l.title == lesson.title && l.date == lesson.date)
+        listFavouriteLessons.remove(l);
+    notifyListeners();
   }
 
   void setHistory(String date, Duration duration) {
@@ -110,68 +197,5 @@ class PreferencesData extends ChangeNotifier {
 
   List<String> getListCompletedLessons() {
     return _listCompletedLessons;
-  }
-
-  void addFavouriteLessons(Lesson lesson) {
-    listFavouriteLessons.add(lesson);
-    notifyListeners();
-  }
-
-  List<Lesson> getFavoriteLessons() {}
-
-  void removeFavouriteLessons(Lesson lesson) {
-    listFavouriteLessons.remove(lesson);
-    notifyListeners();
-    //for (var l in listFavouriteLessons) print(l.title);
-  }
-
-  bool hasToDisplayMessage() {
-    DateFormat format = DateFormat('dd/MM/yyyy');
-
-    DateTime now = DateTime.now();
-    DateTime today = DateTime(now.year, now.month, now.day);
-
-    SharedPreferences.getInstance().then((s) {
-      String lastOK = s.getString('shownMessage');
-      if (lastOK == null) {
-        setShownMessage();
-        return true;
-      }
-
-      DateTime dd = format.parse(lastOK);
-
-      int difference = dd.difference(today).inDays;
-
-      return (difference < 0) ? true : false;
-    });
-  }
-
-  bool getShownMessage() => hasToDisplayMessage();
-
-  void setShownMessage() async {
-    var format = DateFormat('dd/MM/yyyy');
-    var now = DateTime.now();
-    var today = DateTime(now.year, now.month, now.day);
-
-    var s = await SharedPreferences.getInstance();
-    await s.setString('shownMessage', format.format(today));
-  }
-
-  List<String> getStartingMessages() {
-    return listStartingMessages;
-  }
-
-  Future<void> _initListDaysLesson() async {
-    _listDaysLesson = await NetworkHelper.getDayLessons();
-    //print(_listDaysLesson);
-  }
-
-  Future<dynamic> getListDaysLesson() async {
-    if (_listDaysLesson == null) await _initListDaysLesson();
-    return _listDaysLesson;
-  }
-
-  void updateListDaysLesson() {
-    _initListDaysLesson();
   }
 }

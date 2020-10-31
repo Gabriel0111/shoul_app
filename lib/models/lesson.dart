@@ -14,7 +14,7 @@ class Lesson extends Day {
 
   Lesson({this.url, this.title});
 
-  Lesson.fromJson(String lesson) {
+  Lesson.fromString(String lesson) {
     Map data = jsonDecode(lesson);
 
     this.url = data['url'];
@@ -27,16 +27,27 @@ class Lesson extends Day {
     this.iconData = data['iconData'];
   }
 
-  Map toJson() {
+  Lesson.fromJson(Map<String, dynamic> lesson) {
+    this.url = lesson['url'];
+    this.title = lesson['title'];
+    this.date = lesson['date'];
+    this.hebrewDate = lesson['hebrewDate'];
+    this.isFavouriteLessons = lesson['isFavouriteLessons'];
+    this.isCompleted = lesson['isCompleted'];
+    this.weekNumber = lesson['weekNumber'];
+    //this.iconData = data['iconData'];
+  }
+
+  Map<String, dynamic> toJson() {
     return {
-      'url': this.url,
-      'title': this.title,
-      'date': this.date,
-      'hebrewDate': this.hebrewDate,
-      'isFavouriteLessons': this.isFavouriteLessons,
-      'isCompleted': this.isCompleted,
-      'weekNumber': this.weekNumber,
-      'iconData': this.iconData
+      "url": this.url,
+      "title": this.title,
+      "date": this.date,
+      "hebrewDate": this.hebrewDate,
+      "isFavouriteLessons": this.isFavouriteLessons,
+      "isCompleted": this.isCompleted,
+      "weekNumber": this.weekNumber,
+      //"iconData": this.iconData
     };
   }
 }
