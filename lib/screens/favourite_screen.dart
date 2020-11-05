@@ -46,11 +46,11 @@ class FavouriteScreen extends StatelessWidget {
 
                           return CupertinoButton(
                             child: Hero(
+                              flightShuttleBuilder: _flightShuttleBuilder,
                               tag: listFavourite[index].title,
                               child: PresentationCard(
                                 listFavourite[index],
                               ),
-                              flightShuttleBuilder: _flightShuttleBuilder,
                             ),
                             onPressed: () {
                               Navigator.push(

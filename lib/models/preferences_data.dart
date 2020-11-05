@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shoulapp/models/lesson.dart';
 import 'package:shoulapp/network/network_helper.dart';
@@ -26,83 +27,74 @@ class PreferencesData extends ChangeNotifier {
   bool fileExists = false;
 
   PreferencesData() {
-    //_initListDaysLesson();
     _init();
-    //_initFavouriteLessons();
-    _initFavouriteLessonsJson();
-    _initListCompletedLessons();
   }
 
-  void _initFavouriteLessonsJson() {
-    getApplicationDocumentsDirectory().then((Directory directory) {
+  Future<void> _initFavouriteLessons() async {
+    getApplicationDocumentsDirectory().then((Directory directory) async {
       dir = directory;
       File file = new File(dir.path + "/" + fileName);
-      fileExists = file.existsSync();
+      fileExists = await file.exists();
       if (fileExists) {
-        print("Le fichier existe !");
-        String content = file.readAsStringSync();
-        print(content);
         // file.deleteSync();
-        // print("Fichier supprimé");
         // return;
-        //List<dynamic> list;
-        if (content.isNotEmpty) //fileContent = jsonDecode(content);
 
-        {
-          var b = content.split(" ");
-          var list = json.decode(content);
-          for (var l in list) {
-            print(l);
-            print(l.toString());
-            // var a = Lesson.fromJson(l.toString());
-          }
+        String fileContent = await file.readAsString();
+        if (fileContent.isNotEmpty) {
+          List<dynamic> jsonFileContent = json.decode(fileContent);
+          for (var lesson in jsonFileContent)
+            listFavouriteLessons.add(Lesson.fromJson(lesson));
+          notifyListeners();
         }
-
-        print(content);
       } else {
         File file = new File(dir.path + "/" + fileName);
-        file.createSync();
+        await file.create();
         fileExists = true;
       }
     });
   }
 
-  //file.writeAsStringSync(jsonEncode(content));
+  // void writeToFile(String key, String value) {
+  //   print("Writing to file!");
+  //   Map<String, String> content = {key: value};
+  //   if (fileExists) {
+  //     print("File exists");
+  //     Map<String, String> jsonFileContent =
+  //         json.decode(jsonFile.readAsStringSync());
+  //     jsonFileContent.addAll(content);
+  //     jsonFile.writeAsStringSync(jsonEncode(jsonFileContent),
+  //         mode: FileMode.append);
+  //   } else {
+  //     print("File does not exist!");
+  //     //createFile(content, dir, fileName);
+  //   }
+  //   fileContent = jsonDecode(jsonFile.readAsStringSync());
+  //   print(fileContent);
+  // }
 
-  void writeToFile(String key, String value) {
-    print("Writing to file!");
-    Map<String, String> content = {key: value};
-    if (fileExists) {
-      print("File exists");
-      Map<String, String> jsonFileContent =
-          json.decode(jsonFile.readAsStringSync());
-      jsonFileContent.addAll(content);
-      jsonFile.writeAsStringSync(jsonEncode(jsonFileContent),
-          mode: FileMode.append);
-    } else {
-      print("File does not exist!");
-      //createFile(content, dir, fileName);
-    }
-    fileContent = jsonDecode(jsonFile.readAsStringSync());
-    print(fileContent);
-  }
-
-  void addFavouriteLessons(Lesson lesson) {
+  Future<void> addFavouriteLessons(Lesson lesson) async {
     listFavouriteLessons.add(lesson);
     File jsonFile = new File(dir.path + "/" + fileName);
-    String content = jsonFile.readAsStringSync();
+    String content = await jsonFile.readAsString();
     List<dynamic> jsonFileContent = [];
     if (content.isNotEmpty) jsonFileContent = json.decode(content);
     jsonFileContent.add(lesson.toJson());
-    jsonFile.writeAsStringSync("[", mode: FileMode.append);
-    jsonFile.writeAsStringSync(jsonEncode(jsonFileContent));
-    // List<String> list = [];
+    await jsonFile.writeAsString(jsonEncode(jsonFileContent));
 
-    // for (Lesson l in listFavouriteLessons) list.add(l.toJson().toString());
-    // print(list);
-    // sharedPreferences.setStringList('favouriteLessons', list);
-    //sharedPreferences.setStringList('favouriteLessons', value)
+    notifyListeners();
+  }
 
+  Future<void> removeFavouriteLessons(Lesson lesson) async {
+    listFavouriteLessons.removeWhere((l) => l.url == lesson.url);
+
+    File jsonFile = new File(dir.path + "/" + fileName);
+
+    if (listFavouriteLessons.length > 0) {
+      await jsonFile.writeAsString("[");
+      await jsonFile.writeAsString(jsonEncode(listFavouriteLessons));
+    } else {
+      await jsonFile.writeAsString("[]");
+    }
     notifyListeners();
   }
 
@@ -111,7 +103,8 @@ class PreferencesData extends ChangeNotifier {
     dynamic map = sharedPreferences.get('playedAtNow');
     _playedAtNow = (map != null) ? jsonDecode(map) : _playedAtNow = {};
 
-    //print(_playedAtNow);
+    _initFavouriteLessons();
+    _initListCompletedLessons();
   }
 
   Future<List<Lesson>> setListSelectedWeekLesson(Day day) async {
@@ -169,13 +162,6 @@ class PreferencesData extends ChangeNotifier {
     for (var l in listFavouriteLessons)
       if (l.title == lesson.title && l.date == lesson.date) return true;
     return false;
-  }
-
-  void removeFavouriteLessons(Lesson lesson) {
-    for (var l in listFavouriteLessons.toList())
-      if (l.title == lesson.title && l.date == lesson.date)
-        listFavouriteLessons.remove(l);
-    notifyListeners();
   }
 
   void setHistory(String date, Duration duration) {

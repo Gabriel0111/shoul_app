@@ -35,12 +35,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(
-              CupertinoIcons.delete,
-            ),
-            label: 'בית',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
               CupertinoIcons.heart,
             ),
             label: 'מועדפים',
@@ -54,9 +48,6 @@ class _HomeScreenState extends State<HomeScreen> {
             view = CupertinoTabView(builder: (_) => AllLessonsScreen());
             break;
           case 1:
-            view = CupertinoTabView(builder: (_) => Home());
-            break;
-          case 2:
             view = CupertinoTabView(builder: (_) => FavouriteScreen());
             break;
         }
