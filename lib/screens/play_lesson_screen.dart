@@ -42,14 +42,15 @@ class _PlayLessonScreenState extends State<PlayLessonScreen> {
 
   void _initPlayer() async {
     assetsAudioPlayer = AssetsAudioPlayer();
+
     provider = Provider.of<PreferencesData>(context, listen: false);
     leftPlayerTime = Duration(
         seconds: provider.getHistory(
             widget.lessonToPlay.date + ' * ' + widget.lessonToPlay.title));
 
-    if (leftPlayerTime.inSeconds > 0) {
-      print('LAST DURATION : ' + leftPlayerTime.toString());
-    }
+    // if (leftPlayerTime.inSeconds > 0) {
+    //   print('LAST DURATION : ' + leftPlayerTime.toString());
+    // }
 
     assetsAudioPlayer.playlistAudioFinished.listen((finished) {
       if (mounted == true)
@@ -60,7 +61,7 @@ class _PlayLessonScreenState extends State<PlayLessonScreen> {
     });
 
     assetsAudioPlayer.onReadyToPlay.listen((event) {
-      print("C'est bon !!!!!!!!!!!!!!!!!!!!!");
+      //print("C'est bon !!!!!!!!!!!!!!!!!!!!!");
 
       if (mounted == true)
         setState(() {
@@ -103,7 +104,7 @@ class _PlayLessonScreenState extends State<PlayLessonScreen> {
     provider.setHistory(
         widget.lessonToPlay.date + ' * ' + widget.lessonToPlay.title,
         currentDuration);
-    print('FIN //// : ' + currentDuration.toString());
+    //print('FIN //// : ' + currentDuration.toString());
   }
 
   Widget _getPlayerWidget() {

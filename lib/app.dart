@@ -16,24 +16,26 @@ class App extends StatelessWidget {
   }
 
   Widget getApp() {
+    Iterable<LocalizationsDelegate> prefs = [
+      GlobalMaterialLocalizations.delegate,
+      GlobalWidgetsLocalizations.delegate,
+      GlobalCupertinoLocalizations.delegate
+    ];
+
     if (Platform.isIOS) {
       return CupertinoApp(
-        localizationsDelegates: [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate
-        ],
+        debugShowCheckedModeBanner: false,
+        localizationsDelegates: prefs,
         supportedLocales: [const Locale('he', '')],
+        theme: CupertinoThemeData(primaryColor: Color.fromRGBO(0, 175, 200, 1)),
         home: HomeScreen(),
       );
     } else {
       return MaterialApp(
-        localizationsDelegates: [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate
-        ],
+        debugShowCheckedModeBanner: false,
+        localizationsDelegates: prefs,
         supportedLocales: [const Locale('he', '')],
+        theme: ThemeData(primaryColor: Color.fromRGBO(0, 175, 200, 1)),
         home: HomeScreen(),
       );
     }

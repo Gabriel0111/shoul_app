@@ -100,8 +100,22 @@ class FavouriteScreen extends StatelessWidget {
                   ? SliverList(
                       delegate: SliverChildBuilderDelegate(
                           (BuildContext context, int index) {
+                        Widget _flightShuttleBuilder(
+                          BuildContext flightContext,
+                          Animation<double> animation,
+                          HeroFlightDirection flightDirection,
+                          BuildContext fromHeroContext,
+                          BuildContext toHeroContext,
+                        ) {
+                          return DefaultTextStyle(
+                            style: DefaultTextStyle.of(toHeroContext).style,
+                            child: toHeroContext.widget,
+                          );
+                        }
+
                         return CupertinoButton(
                           child: Hero(
+                            flightShuttleBuilder: _flightShuttleBuilder,
                             tag: listFavourite[index].title,
                             child: PresentationCard(
                               listFavourite[index],

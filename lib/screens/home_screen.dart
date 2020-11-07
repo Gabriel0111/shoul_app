@@ -6,7 +6,6 @@ import 'package:persistent_bottom_nav_bar/persistent-tab-view.dart';
 import 'package:shoulapp/screens/favourite_screen.dart';
 
 import 'all_lessons_screen.dart';
-import 'home.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -70,11 +69,6 @@ class _HomeScreenState extends State<HomeScreen> {
           title: ("\tבית"),
           inactiveColor: CupertinoColors.systemGrey,
         ),
-        // PersistentBottomNavBarItem(
-        //   icon: Icon(Icons.delete),
-        //   title: ("\tאחר"),
-        //   inactiveColor: CupertinoColors.systemGrey,
-        // ),
         PersistentBottomNavBarItem(
           icon: Icon(Icons.favorite),
           title: ("\tמועדפים"),

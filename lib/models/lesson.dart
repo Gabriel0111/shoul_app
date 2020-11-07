@@ -45,15 +45,10 @@ class Lesson extends Day {
     this.isCompleted = lesson['isCompleted'];
     this.weekNumber = lesson['weekNumber'];
 
-    int codePoint = lesson['iconData']['codePoint'];
-    String fontFamily = lesson['iconData']['fontFamily'];
-    String fontPackage = lesson['iconData']['fontPackage'];
-    bool matchTextDirection = lesson['iconData']['matchTextDirection'];
-
-    this.iconData = IconData(codePoint,
-        fontFamily: fontFamily,
-        fontPackage: fontPackage,
-        matchTextDirection: matchTextDirection);
+    this.iconData = IconData(lesson['iconData']['codePoint'],
+        fontFamily: lesson['iconData']['fontFamily'],
+        fontPackage: lesson['iconData']['fontPackage'],
+        matchTextDirection: lesson['iconData']['matchTextDirection']);
   }
 
   Map<String, dynamic> toJson() {
@@ -65,7 +60,6 @@ class Lesson extends Day {
       "isFavouriteLessons": this.isFavouriteLessons,
       "isCompleted": this.isCompleted,
       "weekNumber": this.weekNumber,
-      //"iconData": this.iconData
       "iconData": {
         "codePoint": this.iconData.codePoint,
         "fontFamily": this.iconData.fontFamily,

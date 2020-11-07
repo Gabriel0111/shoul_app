@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shoulapp/models/lesson.dart';
 import 'package:shoulapp/network/network_helper.dart';
@@ -30,6 +29,16 @@ class PreferencesData extends ChangeNotifier {
     _init();
   }
 
+  void _init() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+    dynamic map = sharedPreferences.get('playedAtNow');
+    _playedAtNow = (map != null) ? jsonDecode(map) : _playedAtNow = {};
+
+    _initFavouriteLessons();
+    _initListCompletedLessons();
+  }
+
+  //region FavouriteLessons
   Future<void> _initFavouriteLessons() async {
     getApplicationDocumentsDirectory().then((Directory directory) async {
       dir = directory;
@@ -53,24 +62,6 @@ class PreferencesData extends ChangeNotifier {
       }
     });
   }
-
-  // void writeToFile(String key, String value) {
-  //   print("Writing to file!");
-  //   Map<String, String> content = {key: value};
-  //   if (fileExists) {
-  //     print("File exists");
-  //     Map<String, String> jsonFileContent =
-  //         json.decode(jsonFile.readAsStringSync());
-  //     jsonFileContent.addAll(content);
-  //     jsonFile.writeAsStringSync(jsonEncode(jsonFileContent),
-  //         mode: FileMode.append);
-  //   } else {
-  //     print("File does not exist!");
-  //     //createFile(content, dir, fileName);
-  //   }
-  //   fileContent = jsonDecode(jsonFile.readAsStringSync());
-  //   print(fileContent);
-  // }
 
   Future<void> addFavouriteLessons(Lesson lesson) async {
     listFavouriteLessons.add(lesson);
@@ -98,13 +89,18 @@ class PreferencesData extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _init() async {
-    sharedPreferences = await SharedPreferences.getInstance();
-    dynamic map = sharedPreferences.get('playedAtNow');
-    _playedAtNow = (map != null) ? jsonDecode(map) : _playedAtNow = {};
+  bool isLessonFavourite(Lesson lesson) {
+    for (var l in listFavouriteLessons)
+      if (l.title == lesson.title && l.date == lesson.date) return true;
+    return false;
+  }
 
-    _initFavouriteLessons();
-    _initListCompletedLessons();
+  //endregion
+
+  //region ListSelectedWeekLesson
+
+  List<Lesson> getListSelectedWeekLesson() {
+    return listSelectedWeekLesson;
   }
 
   Future<List<Lesson>> setListSelectedWeekLesson(Day day) async {
@@ -124,13 +120,17 @@ class PreferencesData extends ChangeNotifier {
     return listSelectedWeekLesson;
   }
 
-  List<Lesson> getListSelectedWeekLesson() {
-    return listSelectedWeekLesson;
+  //endregion
+
+  //region LessonCompleted
+
+  List<String> getListCompletedLessons() {
+    return _listCompletedLessons;
   }
 
-  bool isLessonCompleted(Lesson lesson) {
-    for (var l in _listCompletedLessons) if (l == lesson.title) return true;
-    return false;
+  void setCompletedLesson(Lesson lesson) {
+    _listCompletedLessons.add(lesson.title);
+    _updateCompletedLessons();
   }
 
   void _initListCompletedLessons() async {
@@ -153,35 +153,28 @@ class PreferencesData extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _updateFavouriteLessons() async {
-    await sharedPreferences.setString('playedAtNow', jsonEncode(_playedAtNow));
-    notifyListeners();
+  bool isLessonCompleted(Lesson lesson) {
+    for (var l in _listCompletedLessons) if (l == lesson.title) return true;
+    return false;
   }
 
-  bool isLessonFavourite(Lesson lesson) {
-    for (var l in listFavouriteLessons)
-      if (l.title == lesson.title && l.date == lesson.date) return true;
-    return false;
+  //endregion
+
+  //region History
+  int getHistory(String date) {
+    return _playedAtNow[date] ?? 0;
   }
 
   void setHistory(String date, Duration duration) {
     if (duration.inSeconds > 0) {
       _playedAtNow[date] = duration.inSeconds;
-      //notifyListeners();
-      _updateFavouriteLessons();
+      _updatePlayedLessons();
     }
   }
 
-  void setCompletedLesson(Lesson lesson) {
-    _listCompletedLessons.add(lesson.title);
-    _updateCompletedLessons();
+  void _updatePlayedLessons() async {
+    await sharedPreferences.setString('playedAtNow', jsonEncode(_playedAtNow));
+    notifyListeners();
   }
-
-  int getHistory(String date) {
-    return _playedAtNow[date] ?? 0;
-  }
-
-  List<String> getListCompletedLessons() {
-    return _listCompletedLessons;
-  }
+  //endregion
 }
