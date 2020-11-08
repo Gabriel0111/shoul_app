@@ -6,6 +6,8 @@ The ShoulApp enables you to listen every day's lessons of Rabbi Ofer Ben Yehouda
 
 Mainly, you can :
 
-- Browse all availables lessons
+- Browse all available lessons
 - Listen to the today's lessons
-- Mak as favourite for a later hearing
+- Mark as favourite for a later hearing
+
+We hope you'll enjoy our app and have an enjoyable Torah learning.
