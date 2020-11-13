@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -84,7 +86,7 @@ class _DayLessonScreenState extends State<DayLessonScreen> {
   Widget build(BuildContext context) {
     _init();
 
-    return getAndroidPage();
+    return (Platform.isIOS) ? getiOSPage() : getAndroidPage();
   }
 
   Widget getiOSPage() {
